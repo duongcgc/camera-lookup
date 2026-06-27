@@ -1,0 +1,340 @@
+
+<style>
+body{max-width: 800px;margin: auto;}
+*{font-family:Verdana, sans-serif;box-sizing:border-box;margin:0;padding:0}
+.w{padding:1rem 0;font-family:var(--font-sans)}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.tab{padding:6px 14px;border-radius:var(--radius);border:0.5px solid var(--border-strong);font-size:13px;cursor:pointer;background:var(--surface-1);color:var(--text-secondary);transition:all .15s}
+.tab.active{background:var(--bg-accent);color:var(--text-accent);border-color:var(--border-accent)}
+.tab:hover:not(.active){background:var(--surface-0)}
+.panel{display:none}.panel.active{display:block}
+.tip{background:var(--bg-success);border:0.5px solid var(--border-success);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--text-success);margin-bottom:1rem;line-height:1.6}
+.warn{background:var(--bg-warning);border:0.5px solid var(--border-warning);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--text-warning);margin-bottom:1rem;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:10px}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--border-strong)}
+.card.open{border-color:var(--border-accent)}
+.card-head{display:flex;align-items:flex-start;gap:10px}
+.badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--radius);white-space:nowrap;flex-shrink:0;margin-top:2px}
+.ctitle{font-size:14px;font-weight:500;color:var(--text-primary);line-height:1.4}
+.csub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.detail{display:none;margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border)}
+.card.open .detail{display:block}
+.row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;align-items:flex-start}
+.lbl{color:var(--text-muted);min-width:86px;flex-shrink:0;padding-top:1px}
+.val{color:var(--text-primary);line-height:1.55;flex:1}
+.pbox{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);line-height:1.65;margin-top:4px;white-space:pre-wrap;word-break:break-word}
+.sec{margin-bottom:1.5rem}
+.sec-title{font-size:12px;font-weight:500;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.plain-card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.ct2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.ct2-col{background:var(--surface-1);border-radius:var(--radius);padding:9px 11px;font-size:12px;color:var(--text-secondary);line-height:1.6}
+.ct2-title{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.search-row{display:flex;gap:8px;margin-bottom:.75rem}
+.search-row input{flex:1;font-size:14px}
+.cnt{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+.formula-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.formula-box{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--text-primary);font-family:var(--font-mono)}
+.formula-op{font-size:18px;color:var(--text-muted);font-weight:500}
+.formula-result{background:var(--bg-accent);border:0.5px solid var(--border-accent);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--text-accent);font-weight:500}
+</style>
+
+<h2 class="sr-only">Bảng tra cứu Behavioral Subtext — hành vi ngầm cho AI filmmaking prompt</h2>
+<div class="w">
+
+<div class="tabs">
+  <div class="tab active" onclick="sw('formula')">Công thức subtext</div>
+  <div class="tab" onclick="sw('behaviors')">Thư viện hành vi</div>
+  <div class="tab" onclick="sw('objects')">Vật thể & đạo cụ</div>
+  <div class="tab" onclick="sw('guide')">Prompt guide</div>
+</div>
+
+<div id="tab-formula" class="panel active">
+  <div class="tip">Subtext = điều nhân vật <em>không</em> nói nhưng hành vi <em>tiết lộ</em>. Công thức: Hành động nhỏ + Timing cụ thể + Động cơ tâm lý ngầm = Diễn xuất có chiều sâu.</div>
+  <div id="formula-div"></div>
+</div>
+
+<div id="tab-behaviors" class="panel">
+  <div class="search-row"><input type="text" id="beh-q" placeholder="Tìm... (vd: hesitate, touch, adjust, reach)" oninput="renderBeh()"></div>
+  <div class="cnt" id="beh-cnt"></div>
+  <div class="grid" id="beh-grid"></div>
+</div>
+
+<div id="tab-objects" class="panel">
+  <div class="tip">Đạo cụ và vật thể là "diễn viên thứ ba" trong cảnh — cách nhân vật <em>tương tác với vật</em> tiết lộ nhiều hơn lời thoại. Đây là kỹ thuật kinh điển của Chekhov và Stanislavski.</div>
+  <div class="grid" id="obj-grid"></div>
+</div>
+
+<div id="tab-guide" class="panel">
+  <div id="guide-div"></div>
+</div>
+
+</div>
+
+<script>
+const CAT_STYLE={
+  hesitation:'background:var(--bg-pro);color:var(--text-pro)',
+  displacement:'background:var(--bg-warning);color:var(--text-warning)',
+  approach:'background:var(--bg-accent);color:var(--text-accent)',
+  withdrawal:'background:var(--bg-danger);color:var(--text-danger)',
+  soothing:'background:var(--bg-success);color:var(--text-success)',
+  dominance:'background:var(--surface-1);color:var(--text-secondary);border:0.5px solid var(--border-strong)',
+  concealment:'background:var(--bg-pro);color:var(--text-pro)',
+  ritual:'background:var(--bg-warning);color:var(--text-warning)',
+};
+
+const BEHAVIORS=[
+  {id:'B01',cat:'hesitation',name:'Reach — pause — withdraw',vn:'Với tay — dừng — rút lại',subtext:'Quyết định chưa được đưa ra, hoặc đã đưa ra nhưng không thực hiện được',timing:'0.5–1 giây dừng ở giữa',prompt:'a hand extending toward them — then stopping,\nhalf-extended, caught between intention and restraint —\nthen slowly drawing back, the decision made\nbefore the body finished making it',films:'Atonement, Normal People'},
+  {id:'B02',cat:'hesitation',name:'Step forward — freeze — hold',vn:'Bước tới — đứng yên — không động',subtext:'Muốn tiến về phía ai đó hoặc điều gì đó nhưng có thứ gì đó giữ lại',timing:'Freeze kéo dài ít nhất 1 giây — phải thấy rõ sự lưỡng lự',prompt:'a step forward, then the body locking —\nfeet planted, mid-motion, the forward momentum\nstalled by something stronger than the intention to move',films:'Marriage Story'},
+  {id:'B03',cat:'hesitation',name:'Opens mouth — closes — doesn\'t speak',vn:'Há miệng — ngậm lại — không nói',subtext:'Lời muốn nói nhưng không thể hoặc không dám — thường là thứ quan trọng nhất trong cảnh',timing:'Rất ngắn — dưới 1 giây — nhưng camera phải bắt được',prompt:'mouth opening slightly — a breath drawn in,\nthe word forming — then the lips closing again,\nthe silence heavier than whatever was almost said',films:'Lost in Translation (cuối phim)'},
+  {id:'B04',cat:'hesitation',name:'Hesitation before touching an object',vn:'Do dự trước khi chạm vào vật',subtext:'Vật thể mang ý nghĩa cảm xúc — chạm vào nó = cam kết',timing:'1–2 giây lơ lửng trước khi chạm',prompt:'fingers hovering over the surface —\nnot touching yet, the gap between hand and object\ncharged with everything the touch would mean',films:'Her, Memento'},
+  {id:'B05',cat:'displacement',name:'Adjusting clothing unnecessarily',vn:'Chỉnh quần áo không cần thiết',subtext:'Lo lắng, bất an, hoặc cần làm gì đó với tay khi không có lý do rõ ràng',timing:'Lặp lại 2–3 lần trong cảnh = displacement rõ ràng',prompt:'fingers finding the collar, adjusting it —\nthen adjusting it again, and once more,\nthe gesture serving no practical purpose\nexcept to give anxiety somewhere to go',films:'The Social Network'},
+  {id:'B06',cat:'displacement',name:'Rearranging objects on a surface',vn:'Sắp xếp lại đồ vật trên bàn',subtext:'Cần kiểm soát điều gì đó khi mọi thứ quan trọng đều ngoài tầm kiểm soát',timing:'Chậm, tỉ mỉ — không phải bồn chồn mà là cần trật tự',prompt:'hands moving the cup a centimeter to the left,\nthen centering it, then adjusting the angle —\ncontrol exercised on the only thing available',films:'Whiplash, OCD portrayals'},
+  {id:'B07',cat:'displacement',name:'Pouring / handling liquid slowly',vn:'Rót nước / xử lý chất lỏng chậm chạp',subtext:'Trì hoãn có chủ đích — cần thêm thời gian để suy nghĩ hoặc tránh trả lời',timing:'Chậm hơn cần thiết — người xem cảm nhận được sự cố ý',prompt:'pouring with deliberate slowness —\nthe action extended beyond its purpose,\nborrowing time that doesn\'t belong to it',films:'There Will Be Blood, No Country for Old Men'},
+  {id:'B08',cat:'displacement',name:'Cleaning / wiping something',vn:'Lau chùi / làm sạch không cần thiết',subtext:'Muốn xóa bỏ điều gì đó — lỗi lầm, ký ức, tình huống — hoặc tạo khoảng cách',timing:'Lặp lại, không kết thúc',prompt:'wiping the surface again — already clean,\nwiped a moment ago, the cloth moving\nin the pattern of someone trying to remove\nsomething that isn\'t there anymore',films:'Lady Macbeth (Shakespeare), Parasite'},
+  {id:'B09',cat:'approach',name:'Leaning in — then catching oneself',vn:'Nghiêng về phía trước — rồi tự kiểm tra',subtext:'Bị kéo về phía ai đó nhưng không muốn lộ ra',timing:'Lean bắt đầu rồi bị dừng giữa chừng — phải thấy hai chuyển động',prompt:'beginning to lean forward, then catching the motion —\nnot a correction, a suppression,\nthe pull toward them visible in the inch\nthat almost closed between them',films:'Before Sunrise, Portrait of a Lady on Fire'},
+  {id:'B10',cat:'approach',name:'Finding reasons to stay in the room',vn:'Tìm lý do để ở lại trong phòng',subtext:'Không muốn rời đi nhưng không thể thừa nhận',timing:'Hành vi nhỏ lặp đi lặp lại — kiểm tra điện thoại, nhìn ra cửa sổ, rồi lại ở lại',prompt:'moving toward the door — then pausing\nto straighten something on the shelf,\nthen pausing again at the window,\neach delay a small vote against leaving',films:'Before Sunset'},
+  {id:'B11',cat:'approach',name:'Mirroring gesture unconsciously',vn:'Phản chiếu cử chỉ vô thức',subtext:'Kết nối thật sự — cơ thể đồng bộ mà không có lệnh từ não',timing:'Xảy ra với độ trễ 0.5–1 giây sau cử chỉ của đối phương',prompt:'a moment later, without awareness,\nthe same gesture — the same angle of the hand,\nthe same tilt of the head — the body\nrepeating what it found worth repeating',films:'—'},
+  {id:'B12',cat:'withdrawal',name:'Creating physical barriers',vn:'Tạo vật cản vật lý giữa hai người',subtext:'Không muốn tiếp cận hoặc bị tiếp cận — bàn, ly nước, túi xách đều có thể là vật cản',timing:'Thường xảy ra ngay sau khi đối phương tiến lại gần',prompt:'picking up the cup — not to drink,\nbut to hold between them, an object\noccupying the space where connection might otherwise form',films:'—'},
+  {id:'B13',cat:'withdrawal',name:'Turning body away mid-conversation',vn:'Xoay người đi trong khi đang nói chuyện',subtext:'Cơ thể từ chối trước khi miệng từ chối',timing:'Chuyển động chậm và dần dần — không phải quay lưng đột ngột',prompt:'the body beginning to rotate, slowly,\nnot enough to be rude — but the angle widening\nbetween them, one degree at a time',films:'—'},
+  {id:'B14',cat:'withdrawal',name:'Focusing on a task to avoid a person',vn:'Tập trung vào việc gì đó để tránh tiếp xúc',subtext:'Sự bận rộn như lá chắn — "Tôi không thể nói chuyện, tôi đang làm việc"',timing:'Bắt đầu đúng vào lúc đối phương muốn nói điều quan trọng',prompt:'hands finding something to do —\neyes dropping to the task with sudden urgency,\nthe work a wall built in real time',films:'Marriage Story, Kramer vs. Kramer'},
+  {id:'B15',cat:'soothing',name:'Self-touching — neck / collarbone',vn:'Tự chạm cổ / xương đòn',subtext:'Tự xoa dịu — phản ứng lo lắng hoặc đe dọa',timing:'Thường vô thức — 1–2 lần rồi tay rơi xuống',prompt:'fingers moving to the collarbone,\nresting there briefly — a self-soothing gesture,\nperformed without awareness,\nthe body comforting itself',films:'—'},
+  {id:'B16',cat:'soothing',name:'Self-touching — arms / rubbing',vn:'Xoa tay lên cánh tay mình',subtext:'Tự ôm mình — cô đơn, lo lắng, hoặc lạnh lòng',timing:'Chậm và lặp lại — không phải ngứa',prompt:'hands moving up and down the arms,\na slow rubbing — not warmth being sought\nbut the particular comfort of one\'s own touch\nwhen no other is available',films:'—'},
+  {id:'B17',cat:'soothing',name:'Touching a specific object for comfort',vn:'Chạm vào vật đặc biệt để lấy bình tĩnh',subtext:'Vật thể là neo cảm xúc — kết nối với người, ký ức, hoặc danh tính',timing:'Có thể lặp lại nhiều lần trong cảnh — mỗi lần ở điểm căng thẳng cao nhất',prompt:'thumb finding the object without looking —\nthe touch automatic, worn smooth\nby the thousand other moments it has served this purpose',films:'Interstellar, Lord of the Rings (Bilbo & ring)'},
+  {id:'B18',cat:'dominance',name:'Deliberately slow movements',vn:'Chuyển động cố ý chậm',subtext:'Người không cần vội — nắm quyền kiểm soát tempo của cảnh',timing:'Chậm hơn tình huống đòi hỏi — tạo sức nặng',prompt:'moving without urgency — each action\ncompleted at its own pace, indifferent\nto what the room is waiting for',films:'No Country for Old Men, The Godfather'},
+  {id:'B19',cat:'dominance',name:'Taking / using someone\'s space or objects',vn:'Chiếm không gian / vật dụng của người khác',subtext:'Kiểm tra ranh giới — hoặc tuyên bố rằng ranh giới không áp dụng cho mình',timing:'Tự nhiên, như thể không cần xin phép',prompt:'picking up the object from in front of them —\nno request, no acknowledgment,\nthe action assuming a permission that was never offered',films:'There Will Be Blood'},
+  {id:'B20',cat:'dominance',name:'Not responding to a question immediately',vn:'Không trả lời ngay khi được hỏi',subtext:'Người có quyền lực không bị áp lực bởi sự im lặng của người khác',timing:'3–5 giây im lặng trước khi trả lời — hoặc không trả lời',prompt:'the question hanging in the air —\na pause that has nothing to do with thinking,\neverything to do with who controls the tempo\nof this conversation',films:'Tinker Tailor Soldier Spy'},
+  {id:'B21',cat:'concealment',name:'Performing normalcy too precisely',vn:'Diễn sự bình thường quá chính xác',subtext:'Khi ai đó đang che giấu điều gì đó, họ thường diễn quá mức — nụ cười hơi rộng, giọng hơi cao, hành động hơi cẩn thận',timing:'Quá mượt mà, quá đúng lúc — không có sự lỏng lẻo tự nhiên',prompt:'smiling at exactly the right moments,\nresponding with exactly the right words —\ncomposure performed so precisely\nit forgets to look effortless',films:'Parasite, Gone Girl'},
+  {id:'B22',cat:'concealment',name:'Redirecting attention / changing subject',vn:'Chuyển hướng chú ý / đổi chủ đề',subtext:'Tránh né câu hỏi hoặc khoảnh khắc bằng cách tạo ra thứ khác để nhìn vào',timing:'Xảy ra ngay tại điểm căng thẳng — quá khớp để là tình cờ',prompt:'just as the question arrives —\na sudden movement, a subject changed,\na door opened for no reason,\nthe conversation rerouted before it could arrive',films:'—'},
+  {id:'B23',cat:'concealment',name:'Micro-pause before answering',vn:'Dừng một nhịp trước khi trả lời',subtext:'0.5–1 giây để kiểm tra câu trả lời trước khi nói ra — dấu hiệu xử lý có chủ đích',timing:'Ngắn nhưng đều đặn — mỗi câu hỏi quan trọng đều có nhịp dừng này',prompt:'a half-beat before the answer —\nnot long, not obvious,\nbut there, every time the question matters',films:'Knives Out, The Talented Mr. Ripley'},
+  {id:'B24',cat:'ritual',name:'Repeated gesture at key moments',vn:'Cử chỉ lặp lại tại các khoảnh khắc quan trọng',subtext:'Hành vi nghi thức — nhân vật làm điều này khi chuẩn bị, khi sợ, khi quyết định',timing:'Phải xuất hiện ít nhất 2 lần trong film để có ý nghĩa',prompt:'the gesture again — the same one,\nat the same kind of moment —\nthe ritual of a person who needs\none true thing when everything else is uncertain',films:'The Pianist, Whiplash'},
+  {id:'B25',cat:'ritual',name:'Preparation ritual before action',vn:'Nghi thức chuẩn bị trước hành động',subtext:'Nhân vật cần sắp xếp thế giới trước khi bước vào điều khó khăn',timing:'Trước khoảnh khắc quan trọng — không thể bỏ qua',prompt:'before moving: a breath held and released,\na small adjustment made,\nthe private preparation of someone\nwho knows what is about to be required of them',films:'Raging Bull, The Revenant'},
+];
+
+const OBJECTS=[
+  {id:'O01',obj:'Ly nước / trà / rượu',use:'Trì hoãn, tránh câu hỏi, hoặc che miệng',prompt:'lifting the cup — not to drink, taking a sip\nthat lasts longer than thirst requires —\nthe cup a pause bought with both hands',subtext:'Khi nhân vật cầm ly lên đúng lúc bị hỏi = không phải khát'},
+  {id:'O02',obj:'Điện thoại',use:'Tránh tiếp xúc, trốn thoát khỏi khoảnh khắc, hoặc tạo khoảng cách',prompt:'eyes dropping to the phone —\nnot because anything arrived,\nbut because looking at it means\nnot having to look at them',subtext:'Nhân vật nhìn vào điện thoại không có thông báo = né tránh'},
+  {id:'O03',obj:'Chìa khóa / đồng xu / vật nhỏ',use:'Tự xoa dịu, bồn chồn, hoặc neo vào hiện tại',prompt:'fingers working the key between them —\na private repetition, smooth from use,\nthe hands occupied so the rest of the body\ncan appear calm',subtext:'Lặp lại = lo lắng; Dừng lại đột ngột = quyết định đã được đưa ra'},
+  {id:'O04',obj:'Bức thư / tài liệu / ảnh',use:'Kết nối với người/ký ức vắng mặt; mang ý nghĩa lớn hơn bản thân vật',prompt:'holding the letter without opening it —\nor opening it for the third time today,\nthe words already known,\nbut the physical fact of it still needed',subtext:'Cách cầm (nhẹ nhàng vs siết chặt) = mối quan hệ với nội dung'},
+  {id:'O05',obj:'Vũ khí / dao / súng',use:'Quyết định chưa đưa ra; quyền lực; sự chuyển đổi',prompt:'a hand resting on the weapon —\nnot drawing it, just resting,\nthe touch a question being asked\nbefore the answer is ready',subtext:'Chạm vào vũ khí = đang cân nhắc; Rút ra = đã quyết định'},
+  {id:'O06',obj:'Nhẫn / vòng / trang sức',use:'Mối quan hệ, cam kết, hoặc ký ức — chạm vào = đang nghĩ đến người đó',prompt:'thumb moving to the ring —\nnot twisting it, just confirming it is there,\na small act of remembering',subtext:'Tháo ra = phủ nhận; đặt lên bàn = chấm dứt'},
+  {id:'O07',obj:'Cửa / cửa sổ',use:'Ranh giới, tự do, thoát khỏi — đứng gần cửa = muốn rời đi',prompt:'standing close to the window —\nnot looking through it, just near it,\nthe glass a few inches from a world\nthat doesn\'t require this conversation',subtext:'Tay chạm tay nắm cửa = sắp rời đi; nhìn ra cửa sổ = escape in the mind'},
+  {id:'O08',obj:'Thức ăn — không ăn',use:'Mất khẩu vị = lo lắng, đau buồn, hoặc tội lỗi; không thể nuốt = cảm xúc nghẹt thở',prompt:'food untouched — fork lifted,\nset down again, lifted, set down —\nthe performance of eating without eating,\nthe appetite lost somewhere earlier in the day',subtext:'Đĩa thức ăn đầy vẫn nguyên = cảm xúc đang chiếm hết không gian bên trong'},
+  {id:'O09',obj:'Đèn / nguồn sáng',use:'Bật/tắt đèn = kiểm soát, cô đơn, hoặc kết thúc',prompt:'a hand reaching for the lamp —\npausing at the switch,\nthe room one decision away from dark',subtext:'Tắt đèn một mình = chấp nhận điều gì đó'},
+  {id:'O10',obj:'Ghế / chỗ ngồi của người vắng mặt',use:'Nhìn vào chỗ của người không còn ở đó = mất mát, nhớ nhung',prompt:'eyes moving to the empty chair —\nnot dwelling, just a glance,\nthe kind that happens before you can stop it',subtext:'Nhìn vào ghế trống = người đó vẫn hiện diện trong tâm trí'},
+];
+
+const FORMULA_DATA=[
+  {formula:'Hành động nhỏ',op:'+',b:'Timing cụ thể',op2:'+',c:'Động cơ ngầm',result:'Subtext hoàn chỉnh'},
+];
+
+function renderFormula(){
+  const d=document.getElementById('formula-div');
+  d.innerHTML=`
+<div class="sec">
+<div class="formula-row">
+  <div class="formula-box">hành động nhỏ</div>
+  <div class="formula-op">+</div>
+  <div class="formula-box">timing cụ thể</div>
+  <div class="formula-op">+</div>
+  <div class="formula-box">động cơ ngầm</div>
+  <div class="formula-op">=</div>
+  <div class="formula-result">subtext thật</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">3 tầng của subtext</div>
+<div class="grid">
+  <div class="plain-card">
+    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:6px">Tầng 1 — Hành động bề mặt</div>
+    <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">Điều nhân vật làm — có thể nhìn thấy, có thể mô tả<br><span style="font-family:var(--font-mono);font-size:12px">he picks up the cup</span></div>
+  </div>
+  <div class="plain-card">
+    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:6px">Tầng 2 — Cách làm (timing + quality)</div>
+    <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">Không phải hành động mà là <em>như thế nào</em><br><span style="font-family:var(--font-mono);font-size:12px">he picks it up just as she finishes the question, holds it without drinking</span></div>
+  </div>
+  <div class="plain-card">
+    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:6px">Tầng 3 — Động cơ ngầm (subtext)</div>
+    <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">Lý do thật — thứ nhân vật không nói ra<br><span style="font-family:var(--font-mono);font-size:12px">the cup is time bought, not thirst answered</span></div>
+  </div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">7 loại hành vi subtext chính</div>
+<div class="grid">
+  <div class="plain-card" style="border-left:3px solid var(--text-pro);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Hesitation (do dự)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Muốn nhưng không làm — hoặc làm rồi thu lại</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--text-warning);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Displacement (chuyển hướng lo lắng)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Năng lượng cảm xúc thoát ra qua hành động không liên quan</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--text-accent);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Approach (tiến lại)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Bị kéo về phía ai đó dù cố không lộ ra</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--text-danger);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Withdrawal (rút lui)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Tạo khoảng cách — vật lý hoặc cảm xúc</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--text-success);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Self-soothing (tự xoa dịu)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Cơ thể tự an ủi khi không ai khác làm được</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--border-stronger);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Dominance (kiểm soát)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Chiếm tempo, không gian, và quyền quyết định của cảnh</div>
+  </div>
+  <div class="plain-card" style="border-left:3px solid var(--text-pro);border-radius:0 12px 12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Concealment (che giấu)</div>
+    <div style="font-size:12px;color:var(--text-muted)">Diễn xuất bình thường quá cẩn thận — chính sự hoàn hảo là dấu hiệu</div>
+  </div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">Ví dụ tổng hợp — cùng một khoảnh khắc, 3 cách đọc subtext khác nhau</div>
+<div class="plain-card">
+  <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:10px">Tình huống: Cô ấy vừa nghe tin xấu. Anh ấy ngồi đối diện.</div>
+  <div class="ct2">
+    <div class="ct2-col"><div class="ct2-title">Subtext A — Đang cố giấu đau</div><span style="font-family:var(--font-mono);font-size:11px">hands folding carefully in lap, spine straight, a smile that arrives a half-second late — performed composure with a seam showing</span></div>
+    <div class="ct2-col"><div class="ct2-title">Subtext B — Muốn anh đến gần</div><span style="font-family:var(--font-mono);font-size:11px">fingers loosening, a small space opening beside her on the bench — not stated, offered, the way a door left ajar is not the same as a closed one</span></div>
+  </div>
+  <div class="ct2">
+    <div class="ct2-col"><div class="ct2-title">Subtext C — Không muốn bị chạm vào</div><span style="font-family:var(--font-mono);font-size:11px">shifting slightly when he leans forward, arms crossing — not dramatically, just enough, the body saying what the voice won't</span></div>
+    <div class="ct2-col"><div class="ct2-title">Ghi nhớ</div>Cùng tin xấu, cùng cảnh — ba subtext tạo ba nhân vật hoàn toàn khác nhau</div>
+  </div>
+</div>
+</div>`;
+}
+
+let exp=new Set();
+function renderBeh(){
+  const q=(document.getElementById('beh-q').value||'').toLowerCase();
+  const f=BEHAVIORS.filter(b=>!q||b.name.toLowerCase().includes(q)||b.vn.toLowerCase().includes(q)||b.subtext.toLowerCase().includes(q)||b.cat.toLowerCase().includes(q));
+  document.getElementById('beh-cnt').textContent=f.length+' hành vi — click để xem prompt';
+  const g=document.getElementById('beh-grid');g.innerHTML='';
+  f.forEach(b=>{
+    const cs=CAT_STYLE[b.cat]||'';
+    const d=document.createElement('div');
+    d.className='card'+(exp.has(b.id)?' open':'');
+    d.innerHTML=`<div class="card-head">
+      <span class="badge" style="${cs}">${b.cat}</span>
+      <div><div class="ctitle">${b.name}</div><div class="csub">${b.vn}</div></div>
+    </div>
+    <div class="detail">
+      <div class="row"><div class="lbl">Subtext</div><div class="val">${b.subtext}</div></div>
+      <div class="row"><div class="lbl">Timing</div><div class="val">${b.timing}</div></div>
+      ${b.films?`<div class="row"><div class="lbl">Phim tham chiếu</div><div class="val">${b.films}</div></div>`:''}
+      <div class="pbox">${b.prompt}</div>
+    </div>`;
+    d.onclick=()=>{if(exp.has(b.id))exp.delete(b.id);else exp.add(b.id);d.classList.toggle('open');};
+    g.appendChild(d);
+  });
+}
+
+function renderObj(){
+  const g=document.getElementById('obj-grid');g.innerHTML='';
+  OBJECTS.forEach(o=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.innerHTML=`<div class="card-head">
+      <div><div class="ctitle">${o.obj}</div><div class="csub">${o.use}</div></div>
+    </div>
+    <div class="detail">
+      <div class="row"><div class="lbl">Subtext</div><div class="val">${o.subtext}</div></div>
+      <div class="pbox">${o.prompt}</div>
+    </div>`;
+    d.onclick=()=>d.classList.toggle('open');
+    g.appendChild(d);
+  });
+}
+
+function renderGuide(){
+  document.getElementById('guide-div').innerHTML=`
+<div class="tip">Subtext prompt là tầng cao nhất — nó không mô tả <em>cái gì</em> mà mô tả <em>tại sao</em>. AI cần biết cả hai để render đúng.</div>
+
+<div class="sec">
+<div class="sec-title">Quy tắc 1 — Đặt tên subtext trước khi viết hành vi</div>
+<div class="plain-card">
+<div class="ct2">
+<div class="ct2-col"><div class="ct2-title">Sai thứ tự</div>Viết hành vi → hy vọng AI hiểu ý<br><span style="font-size:11px;color:var(--text-muted)">→ AI render hành vi nhưng không có tâm lý phía sau</span></div>
+<div class="ct2-col"><div class="ct2-title">Đúng thứ tự</div>Xác định subtext → viết hành vi thể hiện nó<br><span style="font-size:11px;color:var(--text-muted)">→ hành vi và tâm lý nhất quán</span></div>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">Quy tắc 2 — Timing là linh hồn của subtext</div>
+<div class="plain-card">
+<div class="pbox">❌  he picks up the cup and doesn't drink
+✅  he picks up the cup exactly as she finishes the question —
+    holds it at lip height, doesn't drink,
+    sets it down only after he has found
+    something safe to say</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">Quy tắc 3 — Subtext mạnh nhất thường là điều KHÔNG xảy ra</div>
+<div class="plain-card">
+<div class="pbox">Anh ta không ôm cô dù mọi thứ đang kêu gọi điều đó:
+
+he doesn't move toward her —
+the not-moving as present in the frame
+as any gesture would be,
+the space between them
+holding the shape of a decision</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">Template đầy đủ — Subtext Performance Block</div>
+<div class="plain-card">
+<div class="pbox">[SUBTEXT — Shot 14 — Vô Danh trả lại thanh kiếm cho sư huynh]
+
+SURFACE ACTION: đặt thanh kiếm xuống bàn, bước lùi
+
+SUBTEXT: đây không phải trả lại vũ khí —
+  đây là từ chối tất cả những gì thanh kiếm đại diện
+
+BEHAVIOR LAYER:
+placing the sword down — not releasing it,
+setting it, the fingers leaving slowly,
+one at a time, as if each finger
+is making a separate decision
+
+a half-step back — not retreat,
+the distance of someone who does not trust
+what they will do if they stay close
+to what they are giving up
+
+eyes not on the sword after it leaves the hand —
+already looking past it, past the room,
+the way people look when the decision
+is already several hours old
+and the gesture is just the body
+catching up
+
+WHAT IS NOT SAID:
+no words, no explanation —
+the silence carrying the weight
+that no sentence could hold without breaking</div>
+</div>
+</div>`;
+}
+
+function sw(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active',['formula','behaviors','objects','guide'][i]===t);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+renderFormula();renderBeh();renderObj();renderGuide();
+</script>
